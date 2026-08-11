@@ -36,6 +36,20 @@ var PAGINAS = [
   ['contacto.html', 'Contacto']
 ];
 
+var MAPA_PAGINAS = {
+  home: 'index.html',
+  sobre: 'sobre.html',
+  servicos: 'servicos.html',
+  precos: 'precos.html',
+  petiscos: 'petiscos.html',
+  galeria: 'galeria.html',
+  contacto: 'contacto.html'
+};
+
+function destinoPagina(pagina) {
+  return MAPA_PAGINAS[pagina] || (pagina.indexOf('.html') > -1 ? pagina : pagina + '.html');
+}
+
 var SERVICOS = [
   { n: '01', titulo: 'Creche canina', texto: 'Dias de 2.ª a 6.ª feira em grupos reduzidos, com espaço para brincar, explorar e descansar ao ritmo de cada um.' },
   { n: '02', titulo: 'Estadia familiar', texto: 'Hospedagem em ambiente de casa, com a rotina e o carinho a que o seu patudo já está habituado.' },
@@ -794,32 +808,67 @@ function preenche() {
 }
 
 /* ---------- Navegação ---------- */
+function limpaHashAntigo() {
+  var h = (window.location.hash || '').replace('#', '');
+  if (!h) return;
+  if (['home', 'sobre', 'servicos', 'precos', 'petiscos', 'galeria', 'contacto'].indexOf(h) === -1) return;
+  if (window.history && window.history.replaceState) {
+    var novaUrl = window.location.pathname + window.location.search;
+    if (window.location.href !== novaUrl) {
+      window.history.replaceState(null, '', novaUrl);
+    }
+  }
+}
+
 function irPara(pagina, semScroll) {
-  if (!PAGINAS.some(function (p) { return p[0] === pagina; })) pagina = 'home';
+  if (!PAGINAS.some(function (p) { return p[0] === pagina || p[0].replace(/\.html$/, '') === pagina; })) pagina = 'home';
+
+  var paginaAtual = (window.location.pathname || '').split('/').pop() || 'index.html';
+  var paginaArquivo = destinoPagina(pagina);
+
+  if (paginaAtual !== paginaArquivo) {
+    window.location.assign(paginaArquivo);
+    return;
+  }
+
+  var secao = document.getElementById('pg-' + pagina);
+  if (!secao) return;
 
   var paginas = document.querySelectorAll('.pagina');
   for (var i = 0; i < paginas.length; i++) paginas[i].classList.remove('ativa');
-  document.getElementById('pg-' + pagina).classList.add('ativa');
+  secao.classList.add('ativa');
 
   var botoes = document.querySelectorAll('[data-ir]');
   for (var j = 0; j < botoes.length; j++) {
     botoes[j].classList.toggle('atual', botoes[j].getAttribute('data-ir') === pagina);
   }
 
-  document.getElementById('barra-voltar').hidden = pagina === 'home';
-  document.getElementById('drawer').classList.remove('aberto');
+  var barraVoltar = document.getElementById('barra-voltar');
+  if (barraVoltar) barraVoltar.hidden = pagina === 'home';
+  var drawer = document.getElementById('drawer');
+  if (drawer) drawer.classList.remove('aberto');
 
-  if (window.location.hash !== '#' + pagina) window.location.hash = pagina;
+  limpaHashAntigo();
   try { window.localStorage.setItem('mps-page', pagina); } catch (e) {}
   if (!semScroll) suaveAte(0, 900);
 }
 
 function paginaInicial() {
   var h = (window.location.hash || '').replace('#', '');
-  if (PAGINAS.some(function (p) { return p[0] === h; })) return h;
+  if (['home', 'sobre', 'servicos', 'precos', 'petiscos', 'galeria', 'contacto'].indexOf(h) !== -1) {
+    limpaHashAntigo();
+    return 'home';
+  }
+
+  var paginaAtual = (window.location.pathname || '').split('/').pop() || 'index.html';
+  if (paginaAtual && paginaAtual !== 'index.html') {
+    var nomePagina = paginaAtual.replace(/\.html$/, '');
+    if (PAGINAS.some(function (p) { return p[0] === paginaAtual || p[0].replace(/\.html$/, '') === nomePagina; })) return nomePagina;
+  }
+
   var guardada = null;
   try { guardada = window.localStorage.getItem('mps-page'); } catch (e) {}
-  if (PAGINAS.some(function (p) { return p[0] === guardada; })) return guardada;
+  if (PAGINAS.some(function (p) { return p[0] === guardada || p[0].replace(/\.html$/, '') === guardada; })) return guardada;
   return 'home';
 }
 
@@ -881,13 +930,20 @@ function liga() {
 
   window.addEventListener('hashchange', function () {
     var h = (window.location.hash || '').replace('#', '');
+    if (['home', 'sobre', 'servicos', 'precos', 'petiscos', 'galeria', 'contacto'].indexOf(h) !== -1) {
+      limpaHashAntigo();
+      return;
+    }
     if (PAGINAS.some(function (p) { return p[0] === h; })) irPara(h);
   });
 }
 
+limpaHashAntigo();
 preenche();
 liga();
 ligaLoja();
 carregaProdutos(function () { desenhaLoja(); });
 desenhaCarrinho();
-irPara(paginaInicial(), true);
+if (document.getElementById('pg-home')) {
+  irPara(paginaInicial(), true);
+}
