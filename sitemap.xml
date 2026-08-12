@@ -6,32 +6,32 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://www.marciapetstories.pt/#sobre</loc>
+    <loc>https://www.marciapetstories.pt/sobre.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.marciapetstories.pt/#servicos</loc>
+    <loc>https://www.marciapetstories.pt/servicos.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.marciapetstories.pt/#precos</loc>
+    <loc>https://www.marciapetstories.pt/precos.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.marciapetstories.pt/#petiscos</loc>
+    <loc>https://www.marciapetstories.pt/petiscos.html</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.marciapetstories.pt/#galeria</loc>
+    <loc>https://www.marciapetstories.pt/galeria.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://www.marciapetstories.pt/#contacto</loc>
+    <loc>https://www.marciapetstories.pt/contacto.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
