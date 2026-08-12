@@ -512,6 +512,17 @@ p { margin: 0; line-height: 1.8; color: var(--texto-2); }
 
 .caixa-teal { background: var(--teal-soft); border-radius: var(--raio); padding: 28px; display: flex; flex-direction: column; gap: 14px; align-items: flex-start; }
 .caixa-teal h2 { font-size: 22px; color: var(--teal-dark); }
+.caixa-teal h3 { color: var(--teal-dark); }
+.caixa-teal p { font-size: 15px; line-height: 1.75; }
+
+/* Cartão de serviço na variante larga (lista da página Serviços) */
+.cartao.largo { flex-direction: row; gap: 20px; align-items: flex-start; padding: 28px; }
+.cartao.largo .interior { display: flex; flex-direction: column; gap: 8px; }
+.cartao.largo h3 { font-size: 20px; }
+.cartao.largo p { font-size: 16px; }
+.cartao.largo .nota { font-size: 15px; }
+
+.passo h3 { font-size: 18px; margin: 0; }
 .mapa-caixa { border: 1px solid var(--borda); border-radius: var(--raio); overflow: hidden; }
 .mapa-caixa header { padding: 20px 24px; border-bottom: 1px solid var(--borda); }
 .mapa-caixa iframe { display: block; width: 100%; height: 260px; border: 0; }

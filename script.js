@@ -977,123 +977,94 @@ function esc(t) {
 }
 
 /* ---------- Conteúdo ---------- */
-function preenche() {
-  var servicosHome = document.getElementById('servicos-home');
-  if (servicosHome) {
-    servicosHome.innerHTML = SERVICOS.map(function (s) {
-      return '<div class="cartao">' +
-        '<div class="titulo-linha"><h3>' + s.titulo + '</h3>' +
-        (s.pontual ? '<span class="tag-pontual">Pontual</span>' : '') + '</div>' +
-        '<p>' + s.texto + '</p>' +
-        (s.pontual ? '<p class="nota">' + NOTA_PONTUAL + '</p>' : '') +
-        '</div>';
-    }).join('');
-  }
 
-  var servicosLista = document.getElementById('servicos-lista');
-  if (servicosLista) {
-    servicosLista.innerHTML = SERVICOS.map(function (s) {
-      return '<div class="cartao" style="flex-direction:row;gap:20px;align-items:flex-start;padding:28px">' +
-        '<div style="display:flex;flex-direction:column;gap:8px">' +
-        '<div class="titulo-linha"><h3 style="font-size:20px">' + s.titulo + '</h3>' +
-        (s.pontual ? '<span class="tag-pontual">Pontual</span>' : '') + '</div>' +
-        '<p style="font-size:16px">' + s.texto + '</p>' +
-        (s.pontual ? '<p class="nota" style="font-size:15px">' + NOTA_PONTUAL + '</p>' : '') +
-        '</div></div>';
-    }).join('');
-  }
+function fotosHtml(lista, proporcao) {
+  return lista.map(function (f) {
+    return '<div class="foto ' + proporcao + '"><img src="' + esc(f[0]) + '" alt="' + esc(f[1]) + '" loading="lazy" /></div>';
+  }).join('');
+}
 
-  var passos = document.getElementById('passos');
-  if (passos) {
-    passos.innerHTML = PASSOS.map(function (p) {
-      return '<div class="passo"><div class="passo-topo"><div class="numero laranja">' + p.n + '</div>' +
-        '<h3 style="font-size:18px;margin:0">' + p.titulo + '</h3></div><p>' + p.texto + '</p></div>';
-    }).join('');
-  }
+/* O mesmo cartão em duas larguras: a home usa a estreita, a página de
+   Serviços a larga. A diferença é só o invólucro. */
+function cartaoServico(s, largo) {
+  var dentro =
+    '<div class="titulo-linha"><h3>' + esc(s.titulo) + '</h3>' +
+    (s.pontual ? '<span class="tag-pontual">Pontual</span>' : '') + '</div>' +
+    '<p>' + esc(s.texto) + '</p>' +
+    (s.pontual ? '<p class="nota">' + esc(NOTA_PONTUAL) + '</p>' : '');
+  return largo
+    ? '<div class="cartao largo"><div class="interior">' + dentro + '</div></div>'
+    : '<div class="cartao">' + dentro + '</div>';
+}
 
-  var packs = document.getElementById('packs');
-  if (packs) {
-    packs.innerHTML = PACKS.map(function (p) {
+/* id do contentor -> HTML que lhe pertence. Cada página só tem alguns destes
+   contentores; os que não existirem são simplesmente ignorados. */
+var BLOCOS = {
+  'servicos-home': function () {
+    return SERVICOS.map(function (s) { return cartaoServico(s, false); }).join('');
+  },
+  'servicos-lista': function () {
+    return SERVICOS.map(function (s) { return cartaoServico(s, true); }).join('');
+  },
+  'passos': function () {
+    return PASSOS.map(function (p) {
+      return '<div class="passo"><div class="passo-topo"><div class="numero laranja">' + esc(p.n) + '</div>' +
+        '<h3>' + esc(p.titulo) + '</h3></div><p>' + esc(p.texto) + '</p></div>';
+    }).join('');
+  },
+  'packs': function () {
+    return PACKS.map(function (p) {
       return '<div class="pack' + (p.destaque ? ' destaque' : '') + '">' +
-        '<span class="freq">' + p.freq + '</span>' +
-        '<span class="valor">' + p.preco + '</span>' +
+        '<span class="freq">' + esc(p.freq) + '</span>' +
+        '<span class="valor">' + esc(p.preco) + '</span>' +
         '<span class="mes">por mês</span>' +
         (p.destaque ? '<span class="top">Mais escolhido</span>' : '') +
         '</div>';
     }).join('');
-  }
-
-  var valores = document.getElementById('valores');
-  if (valores) {
-    valores.innerHTML = VALORES.map(function (v) {
-      return '<div class="caixa-teal"><h3 style="color:var(--teal-dark)">' + v.titulo + '</h3>' +
-        '<p style="font-size:15px;line-height:1.75">' + v.texto + '</p></div>';
+  },
+  'valores': function () {
+    return VALORES.map(function (v) {
+      return '<div class="caixa-teal"><h3>' + esc(v.titulo) + '</h3><p>' + esc(v.texto) + '</p></div>';
     }).join('');
-  }
-
-  var faq = document.getElementById('faq');
-  if (faq) {
-    faq.innerHTML = FAQS.map(function (f, i) {
+  },
+  'faq': function () {
+    return FAQS.map(function (f, i) {
       return '<div class="faq-item' + (i === 0 ? ' aberto' : '') + '">' +
-        '<button type="button">' + f[0] + '<span>' + (i === 0 ? '−' : '+') + '</span></button>' +
-        '<p>' + f[1] + '</p></div>';
+        '<button type="button">' + esc(f[0]) + '<span>' + (i === 0 ? '−' : '+') + '</span></button>' +
+        '<p>' + esc(f[1]) + '</p></div>';
     }).join('');
-  }
+  },
+  'rail-creche': function () { return fotosHtml(FOTOS, 'r11'); },
+  'rail-galeria': function () { return fotosHtml(FOTOS, 'r34'); },
+  'fotos-petiscos': function () { return fotosHtml(FOTOS_PETISCOS, 'r34'); }
+};
 
-  function fotosHtml(lista, proporcao) {
-    return lista.map(function (f) {
-      return '<div class="foto ' + proporcao + '"><img src="' + f[0] + '" alt="' + esc(f[1]) + '" loading="lazy" /></div>';
-    }).join('');
-  }
+function cadaUm(seletor, aplica) {
+  var els = document.querySelectorAll(seletor);
+  for (var i = 0; i < els.length; i++) aplica(els[i]);
+}
 
-  var railCreche = document.getElementById('rail-creche');
-  if (railCreche) railCreche.innerHTML = fotosHtml(FOTOS, 'r11');
-
-  var railGaleria = document.getElementById('rail-galeria');
-  if (railGaleria) railGaleria.innerHTML = fotosHtml(FOTOS, 'r34');
-
-  var fotosPetiscos = document.getElementById('fotos-petiscos');
-  if (fotosPetiscos) fotosPetiscos.innerHTML = fotosHtml(FOTOS_PETISCOS, 'r34');
+function preenche() {
+  Object.keys(BLOCOS).forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el) el.innerHTML = BLOCOS[id]();
+  });
 
   var navHtml = PAGINAS.map(function (p) {
-    var href = p[0];
-    var atual = (window.location.pathname || '').split('/').pop() === href;
-    return '<a class="nav-link' + (atual ? ' atual' : '') + '" href="' + href + '">' + p[1] + '</a>';
+    var atual = (window.location.pathname || '').split('/').pop() === p[0];
+    return '<a class="nav-link' + (atual ? ' atual' : '') + '" href="' + esc(p[0]) + '">' + esc(p[1]) + '</a>';
   }).join('');
+  cadaUm('#nav-desktop, #nav-mobile, #nav-rodape', function (el) { el.innerHTML = navHtml; });
 
-  var navDesktop = document.getElementById('nav-desktop');
-  if (navDesktop) navDesktop.innerHTML = navHtml;
-
-  var navMobile = document.getElementById('nav-mobile');
-  if (navMobile) navMobile.innerHTML = navHtml;
-
-  var navRodape = document.getElementById('nav-rodape');
-  if (navRodape) navRodape.innerHTML = navHtml;
-
-  var links = document.querySelectorAll('a.wa');
-  for (var i = 0; i < links.length; i++) links[i].href = WA;
-
-  var waTopo = document.getElementById('wa-topo');
-  if (waTopo) waTopo.href = WA;
-
-  var igs = document.querySelectorAll('a.ig');
-  for (var j = 0; j < igs.length; j++) { igs[j].href = CONTACTO.instagram; igs[j].innerHTML = ICONES.ig; }
-
-  var fbs = document.querySelectorAll('a.fb');
-  for (var k = 0; k < fbs.length; k++) { fbs[k].href = CONTACTO.facebook; fbs[k].innerHTML = ICONES.fb; }
-
-  var waIcones = document.querySelectorAll('a.wa.cheio');
-  for (var m = 0; m < waIcones.length; m++) waIcones[m].innerHTML = ICONES.wa;
-
-  ['email-link', 'email-rodape'].forEach(function (id) {
-    var el = document.getElementById(id);
-    if (!el) return;
+  cadaUm('a.wa, #wa-topo', function (el) { el.href = WA; });
+  cadaUm('a.ig', function (el) { el.href = CONTACTO.instagram; el.innerHTML = ICONES.ig; });
+  cadaUm('a.fb', function (el) { el.href = CONTACTO.facebook; el.innerHTML = ICONES.fb; });
+  cadaUm('a.wa.cheio', function (el) { el.innerHTML = ICONES.wa; });
+  cadaUm('#email-link, #email-rodape', function (el) {
     el.href = 'mailto:' + CONTACTO.email;
     el.textContent = CONTACTO.email;
   });
-
-  var ano = document.getElementById('ano');
-  if (ano) ano.textContent = new Date().getFullYear();
+  cadaUm('#ano', function (el) { el.textContent = new Date().getFullYear(); });
 }
 
 /* ---------- Navegação ---------- */
