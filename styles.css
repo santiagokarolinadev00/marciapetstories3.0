@@ -506,6 +506,8 @@ p { margin: 0; line-height: 1.8; color: var(--texto-2); }
   height: 40px;
 }
 .campo textarea { padding: 10px 12px; height: auto; resize: vertical; }
+/* Tradução em PT do rótulo nativo do país (ex.: "PLZ" → "código postal") */
+.campo .ajuda-campo { font-size: 12px; line-height: 1.4; color: var(--texto-2); margin-top: -2px; }
 .campo input:focus, .campo select:focus, .campo textarea:focus { border-color: var(--teal); }
 
 .caixa-teal { background: var(--teal-soft); border-radius: var(--raio); padding: 28px; display: flex; flex-direction: column; gap: 14px; align-items: flex-start; }

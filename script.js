@@ -116,29 +116,262 @@ var ENTREGA = { origem: { lat: 38.577348, lng: -8.875356 }, base: 2.5, baseKm: 3
 
 var PRODUTOS = [];
 var CARRINHO = [];
-/* Limites e limpeza dos campos do checkout */
-var LIMITES = { nome: 60, telefone: 20, morada: 80, numero: 20, cpostal: 12, localidade: 40, destinatario: 60, pais: 40, notas: 300 };
+/* Limites dos campos que não dependem do país */
+var LIMITES = { nome: 60, telefone: 20, paisOutro: 40, notas: 300 };
 
-var PAISES = ['Portugal', 'Espanha', 'França', 'Reino Unido', 'Alemanha', 'Suíça', 'Luxemburgo', 'Outro'];
+/* ── Endereços por país ───────────────────────────────────────────────
+   Fonte única de verdade do formulário de envio: que campos aparecem,
+   por que ordem, com que rótulo, se são obrigatórios e como se validam.
+   Cada país declara só o que difere de PAIS_FALLBACK / CAMPOS_BASE.
+   Para acrescentar um país basta uma entrada nova em PAISES_CFG. */
+
+/* Limpeza aplicada enquanto o utilizador escreve. */
+var MASCARAS = {
+  livre: function (v) { return v; },
+  texto: function (v) { return v.replace(/[^\p{L}\p{M}\s.'-]/gu, ''); },
+  local: function (v) { return v.replace(/[^\p{L}\p{M}\p{N}\s.,'\/-]/gu, ''); },
+  numero: function (v) { return v.replace(/[^\p{L}\p{N}\s.ºª,\/-]/gu, ''); },
+  digitos: function (v) { return v.replace(/\D/g, ''); },
+  alfanumerico: function (v) { return v.replace(/[^\p{L}\p{N}\s-]/gu, '').toUpperCase(); },
+  cpPt: function (v) {
+    var d = v.replace(/\D/g, '').slice(0, 7);
+    return d.length > 4 ? d.slice(0, 4) + '-' + d.slice(4) : d;
+  }
+};
+
+/* Valores por omissão de cada campo, antes das especializações do país. */
+var CAMPOS_BASE = {
+  morada: { rotulo: 'Morada (rua)', ajuda: '', obrigatorio: true, min: 4, max: 80, mascara: 'livre', autocomplete: 'address-line1', placeholder: '' },
+  numero: { rotulo: 'Nº / Andar', ajuda: '', obrigatorio: true, min: 1, max: 20, mascara: 'numero', meia: true, placeholder: '' },
+  cpostal: { rotulo: 'Código postal', ajuda: '', obrigatorio: false, min: 0, max: 12, mascara: 'alfanumerico', meia: true, autocomplete: 'postal-code', regex: null, erro: '', placeholder: '' },
+  localidade: { rotulo: 'Localidade', ajuda: '', obrigatorio: true, min: 2, max: 40, mascara: 'local', autocomplete: 'address-level2', placeholder: '' },
+  regiao: { rotulo: 'Região / Estado', ajuda: '', obrigatorio: false, min: 0, max: 40, mascara: 'local', autocomplete: 'address-level1', placeholder: '' },
+  destinatario: { rotulo: 'Nome do destinatário', ajuda: 'se a encomenda for para outra pessoa', obrigatorio: false, min: 0, max: 60, mascara: 'texto', placeholder: '' }
+};
+
+/* Usado por "Outro" e por qualquer país sem entrada própria. Nunca bloqueia. */
+var PAIS_FALLBACK = {
+  indicativo: '',
+  telMax: 15,
+  telRegex: null, /* null = só aceita número internacional começado por + */
+  telErro: 'telefone com indicativo internacional (ex.: +34 600 000 000)',
+  telPlaceholder: '+34 600 000 000',
+  ordem: ['morada', 'numero', 'cpostal', 'localidade', 'regiao'],
+  campos: {
+    morada: { placeholder: 'Rua / Street' },
+    cpostal: { ajuda: 'se existir no país de destino' },
+    regiao: { ajuda: 'divisão administrativa' }
+  }
+};
+
+var PAISES_CFG = {
+  'Portugal': {
+    indicativo: '+351', telMax: 9, telRegex: /^[29]\d{8}$/,
+    telErro: 'telefone português com 9 dígitos', telPlaceholder: '912 345 678',
+    ordem: ['morada', 'numero', 'cpostal', 'localidade', 'regiao'],
+    campos: {
+      morada: { placeholder: 'Rua das Videiras' },
+      numero: { placeholder: '12, 2.º Esq.' },
+      cpostal: { obrigatorio: true, max: 8, mascara: 'cpPt', inputmode: 'numeric', regex: /^\d{4}-\d{3}$/, erro: 'código postal no formato 0000-000', placeholder: '2950-034' },
+      localidade: { placeholder: 'Palmela' },
+      regiao: { rotulo: 'Distrito', placeholder: 'Setúbal' }
+    }
+  },
+  'Espanha': {
+    indicativo: '+34', telMax: 9, telRegex: /^[6789]\d{8}$/,
+    telErro: 'telefone espanhol com 9 dígitos', telPlaceholder: '600 000 000',
+    ordem: ['morada', 'numero', 'cpostal', 'localidade', 'regiao'],
+    campos: {
+      morada: { rotulo: 'Dirección (calle)', ajuda: 'morada / rua', placeholder: 'Calle Mayor' },
+      numero: { rotulo: 'Nº / Piso', ajuda: 'número e andar' },
+      cpostal: { obrigatorio: true, max: 5, mascara: 'digitos', inputmode: 'numeric', regex: /^\d{5}$/, erro: 'código postal espanhol com 5 dígitos', placeholder: '28013' },
+      localidade: { rotulo: 'Población', ajuda: 'localidade', placeholder: 'Madrid' },
+      regiao: { rotulo: 'Provincia', ajuda: 'província', obrigatorio: true, min: 2, placeholder: 'Madrid' }
+    }
+  },
+  'França': {
+    indicativo: '+33', telMax: 10, telRegex: /^0?[1-9]\d{8}$/,
+    telErro: 'telefone francês com 9 ou 10 dígitos', telPlaceholder: '06 12 34 56 78',
+    ordem: ['morada', 'numero', 'cpostal', 'localidade'],
+    campos: {
+      morada: { rotulo: 'Adresse (rue)', ajuda: 'morada / rua', placeholder: 'Rue de Rivoli' },
+      numero: { rotulo: 'Nº / Étage', ajuda: 'número e andar' },
+      cpostal: { rotulo: 'Code postal', ajuda: 'código postal', obrigatorio: true, max: 5, mascara: 'digitos', inputmode: 'numeric', regex: /^\d{5}$/, erro: 'code postal com 5 dígitos', placeholder: '75001' },
+      localidade: { rotulo: 'Ville', ajuda: 'localidade', placeholder: 'Paris' }
+    }
+  },
+  'Reino Unido': {
+    indicativo: '+44', telMax: 11, telRegex: /^0?\d{10}$/,
+    telErro: 'telefone britânico com 10 dígitos', telPlaceholder: '07700 900123',
+    ordem: ['morada', 'numero', 'localidade', 'regiao', 'cpostal'],
+    campos: {
+      morada: { rotulo: 'Address (street)', ajuda: 'morada / rua', placeholder: 'Baker Street' },
+      numero: { rotulo: 'House nº / Flat', ajuda: 'número e andar' },
+      localidade: { rotulo: 'Town / City', ajuda: 'localidade', placeholder: 'London' },
+      regiao: { rotulo: 'County', ajuda: 'condado', placeholder: 'Greater London' },
+      cpostal: { rotulo: 'Postcode', ajuda: 'código postal', obrigatorio: true, max: 8, mascara: 'alfanumerico', regex: /^[A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2}$/, erro: 'postcode válido (ex.: SW1A 1AA)', placeholder: 'SW1A 1AA' }
+    }
+  },
+  'Alemanha': {
+    indicativo: '+49', telMax: 12, telRegex: /^0?\d{9,11}$/,
+    telErro: 'telefone alemão', telPlaceholder: '0151 23456789',
+    ordem: ['morada', 'numero', 'cpostal', 'localidade', 'regiao'],
+    campos: {
+      morada: { rotulo: 'Straße', ajuda: 'morada / rua', placeholder: 'Hauptstraße' },
+      numero: { rotulo: 'Hausnr. / Etage', ajuda: 'número e andar' },
+      cpostal: { rotulo: 'PLZ', ajuda: 'código postal', obrigatorio: true, max: 5, mascara: 'digitos', inputmode: 'numeric', regex: /^\d{5}$/, erro: 'PLZ com 5 dígitos', placeholder: '10115' },
+      localidade: { rotulo: 'Ort', ajuda: 'localidade', placeholder: 'Berlin' },
+      regiao: { rotulo: 'Bundesland', ajuda: 'estado federado', placeholder: 'Berlin' }
+    }
+  },
+  'Suíça': {
+    indicativo: '+41', telMax: 10, telRegex: /^0?\d{9}$/,
+    telErro: 'telefone suíço', telPlaceholder: '079 123 45 67',
+    ordem: ['morada', 'numero', 'cpostal', 'localidade', 'regiao'],
+    campos: {
+      morada: { rotulo: 'Straße / Rue', ajuda: 'morada / rua', placeholder: 'Bahnhofstrasse' },
+      numero: { rotulo: 'Nr. / Etage', ajuda: 'número e andar' },
+      cpostal: { rotulo: 'PLZ / NPA', ajuda: 'código postal', obrigatorio: true, max: 4, mascara: 'digitos', inputmode: 'numeric', regex: /^\d{4}$/, erro: 'PLZ suíço com 4 dígitos', placeholder: '8001' },
+      localidade: { rotulo: 'Ort / Lieu', ajuda: 'localidade', placeholder: 'Zürich' },
+      regiao: { rotulo: 'Kanton', ajuda: 'cantão', max: 20, placeholder: 'ZH' }
+    }
+  },
+  'Luxemburgo': {
+    indicativo: '+352', telMax: 9, telRegex: /^\d{6,9}$/,
+    telErro: 'telefone luxemburguês', telPlaceholder: '621 123 456',
+    ordem: ['morada', 'numero', 'cpostal', 'localidade'],
+    campos: {
+      morada: { rotulo: 'Adresse (rue)', ajuda: 'morada / rua', placeholder: 'Rue de la Gare' },
+      numero: { rotulo: 'Nº / Étage', ajuda: 'número e andar' },
+      cpostal: { rotulo: 'Code postal', ajuda: 'código postal', obrigatorio: true, max: 6, mascara: 'alfanumerico', regex: /^(L-)?\d{4}$/, erro: 'code postal com 4 dígitos (ex.: L-1611)', placeholder: 'L-1611' },
+      localidade: { rotulo: 'Localité', ajuda: 'localidade', placeholder: 'Luxembourg' }
+    }
+  },
+  'Bélgica': {
+    indicativo: '+32', telMax: 10, telRegex: /^0?\d{8,9}$/,
+    telErro: 'telefone belga', telPlaceholder: '0470 12 34 56',
+    ordem: ['morada', 'numero', 'cpostal', 'localidade'],
+    campos: {
+      morada: { rotulo: 'Straat / Rue', ajuda: 'morada / rua', placeholder: 'Rue Neuve' },
+      numero: { rotulo: 'Nr. / Étage', ajuda: 'número e andar' },
+      cpostal: { rotulo: 'Postcode / Code postal', ajuda: 'código postal', obrigatorio: true, max: 4, mascara: 'digitos', inputmode: 'numeric', regex: /^\d{4}$/, erro: 'código postal belga com 4 dígitos', placeholder: '1000' },
+      localidade: { rotulo: 'Gemeente / Commune', ajuda: 'localidade', placeholder: 'Bruxelles' }
+    }
+  },
+  'Países Baixos': {
+    indicativo: '+31', telMax: 10, telRegex: /^0?\d{9}$/,
+    telErro: 'telefone neerlandês', telPlaceholder: '06 12345678',
+    ordem: ['morada', 'numero', 'cpostal', 'localidade', 'regiao'],
+    campos: {
+      morada: { rotulo: 'Straat', ajuda: 'morada / rua', placeholder: 'Damrak' },
+      numero: { rotulo: 'Huisnr. / Etage', ajuda: 'número e andar' },
+      cpostal: { rotulo: 'Postcode', ajuda: 'código postal', obrigatorio: true, max: 7, mascara: 'alfanumerico', regex: /^\d{4} ?[A-Z]{2}$/, erro: 'postcode no formato 1234 AB', placeholder: '1012 AB' },
+      localidade: { rotulo: 'Plaats', ajuda: 'localidade', placeholder: 'Amsterdam' },
+      regiao: { rotulo: 'Provincie', ajuda: 'província', placeholder: 'Noord-Holland' }
+    }
+  },
+  'Itália': {
+    indicativo: '+39', telMax: 11, telRegex: /^\d{9,11}$/,
+    telErro: 'telefone italiano', telPlaceholder: '312 345 6789',
+    ordem: ['morada', 'numero', 'cpostal', 'localidade', 'regiao'],
+    campos: {
+      morada: { rotulo: 'Indirizzo (via)', ajuda: 'morada / rua', placeholder: 'Via Roma' },
+      numero: { rotulo: 'Nº civico / Piano', ajuda: 'número e andar' },
+      cpostal: { rotulo: 'CAP', ajuda: 'código postal', obrigatorio: true, max: 5, mascara: 'digitos', inputmode: 'numeric', regex: /^\d{5}$/, erro: 'CAP com 5 dígitos', placeholder: '00184' },
+      localidade: { rotulo: 'Comune', ajuda: 'localidade', placeholder: 'Roma' },
+      regiao: { rotulo: 'Provincia', ajuda: 'sigla da província', obrigatorio: true, min: 2, max: 20, placeholder: 'RM' }
+    }
+  },
+  'Irlanda': {
+    indicativo: '+353', telMax: 10, telRegex: /^0?\d{9}$/,
+    telErro: 'telefone irlandês', telPlaceholder: '085 123 4567',
+    ordem: ['morada', 'numero', 'localidade', 'regiao', 'cpostal'],
+    campos: {
+      morada: { rotulo: 'Address (street)', ajuda: 'morada / rua', placeholder: "O'Connell Street" },
+      numero: { rotulo: 'House nº / Flat', ajuda: 'número e andar' },
+      localidade: { rotulo: 'Town / City', ajuda: 'localidade', placeholder: 'Dublin' },
+      regiao: { rotulo: 'County', ajuda: 'condado', obrigatorio: true, min: 2, placeholder: 'Co. Dublin' },
+      cpostal: { rotulo: 'Eircode', ajuda: 'código postal', max: 8, mascara: 'alfanumerico', regex: /^[A-Z]\d{2} ?[A-Z\d]{4}$/, erro: 'Eircode válido (ex.: D02 AF30)', placeholder: 'D02 AF30' }
+    }
+  },
+  'Outro': {}
+};
+
+var PAISES = Object.keys(PAISES_CFG);
+
+/* A entrega em mão é sempre em Portugal (a geocodificação está travada em PT),
+   por isso só o modo "Envio CTT" consulta o país escolhido. */
+var ORDEM_ENTREGA = ['morada', 'numero', 'cpostal', 'localidade'];
+
+function paisAtivo() {
+  return CHECKOUT.modo === 'ctt' ? CHECKOUT.pais : 'Portugal';
+}
+
+function juntaCfg(base, extra) {
+  var r = {}, k;
+  for (k in base) if (Object.prototype.hasOwnProperty.call(base, k)) r[k] = base[k];
+  for (k in extra) if (Object.prototype.hasOwnProperty.call(extra, k)) r[k] = extra[k];
+  return r;
+}
+
+function cfgPais(nome) {
+  return juntaCfg(PAIS_FALLBACK, PAISES_CFG[nome] || {});
+}
+
+/* Config final de um campo: base → fallback → especialização do país.
+   Devolve null para chaves que não são de endereço (nome, notas, ...). */
+function cfgCampo(pais, chave) {
+  if (!CAMPOS_BASE[chave]) return null;
+  var especifico = ((PAISES_CFG[pais] || {}).campos || {})[chave];
+  var generico = especifico ? {} : (PAIS_FALLBACK.campos[chave] || {});
+  return juntaCfg(juntaCfg(CAMPOS_BASE[chave], generico), especifico || {});
+}
+
+function ordemCampos() {
+  return CHECKOUT.modo === 'ctt' ? cfgPais(CHECKOUT.pais).ordem : ORDEM_ENTREGA;
+}
+
+/* Troca de país: re-valida o que já estava preenchido em vez de deitar fora.
+   O código postal é testado ANTES do corte pelo `max` do novo país — senão um
+   2950-034 truncado a 29500 passaria na regex espanhola e guardava-se lixo. */
+function trocaPais(novo) {
+  CHECKOUT.pais = novo;
+  var cfg = cfgPais(novo);
+  var cc = cfgCampo(novo, 'cpostal');
+  var cru = (MASCARAS[cc.mascara] || MASCARAS.livre)(String(CHECKOUT.cpostal || ''));
+  CHECKOUT.cpostal = (cru && cc.regex && !cc.regex.test(cru.trim())) ? '' : cru.slice(0, cc.max);
+  if (cfg.ordem.indexOf('regiao') === -1) CHECKOUT.regiao = '';
+  else CHECKOUT.regiao = limpaCampo('regiao', CHECKOUT.regiao);
+  if (novo !== 'Outro') CHECKOUT.paisOutro = '';
+  CHECKOUT.telefone = limpaCampo('telefone', CHECKOUT.telefone);
+  limpaEntrega();
+}
+
+/* Nome legível de um campo para as mensagens de erro. Os rótulos nativos são
+   siglas (PLZ, CAP), por isso não se põem em minúsculas — junta-se a ajuda em PT. */
+function nomeCampo(c) {
+  return c.ajuda ? c.rotulo + ' (' + c.ajuda + ')' : c.rotulo.toLowerCase();
+}
+
+/* Devolve '' se o campo está bom, ou a descrição do que falta. */
+function validaCampo(chave, c) {
+  var v = String(CHECKOUT[chave] || '').trim();
+  if (!v) return c.obrigatorio ? nomeCampo(c) : '';
+  if (c.min && v.length < c.min) return nomeCampo(c);
+  if (c.regex && !c.regex.test(v)) return c.erro || nomeCampo(c);
+  return '';
+}
 
 function limpaCampo(chave, valor) {
   var v = String(valor).replace(/[\u0000-\u001F\u007F<>]/g, '');
   if (chave === 'telefone') {
     var mais = v.trim().charAt(0) === '+';
-    var dig = v.replace(/\D/g, '').slice(0, mais ? 15 : 9);
-    v = (mais ? '+' : '') + dig;
-  } else if (chave === 'cpostal') {
-    if (CHECKOUT.pais === 'Portugal') {
-      var d = v.replace(/\D/g, '').slice(0, 7);
-      v = d.length > 4 ? d.slice(0, 4) + '-' + d.slice(4) : d;
-    } else {
-      v = v.replace(/[^\p{L}\p{N}\s-]/gu, '').toUpperCase();
-    }
-  } else if (chave === 'nome' || chave === 'destinatario' || chave === 'localidade' || chave === 'paisOutro') {
-    v = v.replace(/[^\p{L}\p{M}\s.'-]/gu, '');
-  } else if (chave === 'numero') {
-    v = v.replace(/[^\p{L}\p{N}\s.ºª,\/-]/gu, '');
+    var dig = v.replace(/\D/g, '').slice(0, mais ? 15 : (cfgPais(paisAtivo()).telMax || 15));
+    return (mais ? '+' : '') + dig;
   }
+  var c = cfgCampo(paisAtivo(), chave);
+  if (c) return (MASCARAS[c.mascara] || MASCARAS.livre)(v).slice(0, c.max);
+  if (chave === 'nome' || chave === 'paisOutro') v = MASCARAS.texto(v);
   var max = LIMITES[chave];
   return max ? v.slice(0, max) : v;
 }
@@ -149,12 +382,15 @@ function paisEnvio() {
 }
 
 function telefoneValido(t) {
-  var dig = String(t).replace(/\D/g, '');
-  return String(t).trim().charAt(0) === '+' ? dig.length >= 9 && dig.length <= 15 : /^9\d{8}$|^2\d{8}$/.test(dig);
+  var s = String(t).trim();
+  var dig = s.replace(/\D/g, '');
+  if (s.charAt(0) === '+') return dig.length >= 8 && dig.length <= 15;
+  var regex = cfgPais(paisAtivo()).telRegex;
+  return regex ? regex.test(dig) : false;
 }
 
 function checkoutVazio() {
-  return { nome: '', telefone: '', modo: 'recolha', morada: '', numero: '', cpostal: '', localidade: '', pais: 'Portugal', paisOutro: '', destinatario: '', notas: '', taxa: null, dist: null, aviso: '' };
+  return { nome: '', telefone: '', modo: 'recolha', morada: '', numero: '', cpostal: '', localidade: '', regiao: '', pais: 'Portugal', paisOutro: '', destinatario: '', notas: '', taxa: null, dist: null, aviso: '' };
 }
 var CHECKOUT = checkoutVazio();
 var ULTIMO_LINK_WA = '';
@@ -212,11 +448,13 @@ var TOLERANCIA_CP_KM = 6;
 function calculaEntrega() {
   var morada = (CHECKOUT.morada || '').trim().replace(/[,;]+$/, '');
   var cp = (CHECKOUT.cpostal || '').trim();
-  var cpValido = /^\d{4}-\d{3}$/.test(cp);
+  /* A entrega em mão é sempre em PT, mas a regra vem na mesma da configuração. */
+  var cpCfg = cfgCampo('Portugal', 'cpostal');
+  var cpValido = cpCfg.regex.test(cp);
   var cp4 = cp.slice(0, 4);
 
-  if (!morada && !cpValido) { mostraInfoEntrega('Indique a morada e o código postal (formato 0000-000).', 'erro'); return; }
-  if (cp && !cpValido) { mostraInfoEntrega('Código postal inválido. Use o formato 0000-000.', 'erro'); return; }
+  if (!morada && !cpValido) { mostraInfoEntrega('Indique a morada e o ' + cpCfg.erro + '.', 'erro'); return; }
+  if (cp && !cpValido) { mostraInfoEntrega('Código postal inválido. Use o ' + cpCfg.erro + '.', 'erro'); return; }
   mostraInfoEntrega('A calcular…', '');
 
   /* Âncora: o código postal completo e, se falhar, os 4 primeiros dígitos —
@@ -426,30 +664,58 @@ function desenhaCarrinho() {
   var modo = CHECKOUT.modo;
   var entrega = modo === 'entrega';
   var ctt = modo === 'ctt';
+  var cfgTel = cfgPais(paisAtivo());
 
   function campo(id, chave, rotulo, extra) {
     return '<div class="campo"><label for="' + id + '">' + rotulo + '</label>' +
       '<input id="' + id + '" data-ck="' + chave + '" value="' + esc(CHECKOUT[chave] || '') + '" ' + (extra || '') + ' /></div>';
   }
 
-  var camposMorada = (entrega || ctt)
-    ? campo('ck-morada', 'morada', 'Morada (rua)', 'maxlength="80" autocomplete="address-line1" placeholder="Rua das Videiras"') +
-      '<div class="par-campos">' +
-        campo('ck-num', 'numero', 'Nº / Andar', 'maxlength="20" placeholder="12, 2.º Esq."') +
-        campo('ck-cp', 'cpostal', 'Código postal', CHECKOUT.modo === 'ctt' && CHECKOUT.pais !== 'Portugal'
-          ? 'maxlength="12" placeholder="Código postal"'
-          : 'placeholder="2950-034" inputmode="numeric" maxlength="8"') +
-      '</div>' +
-      campo('ck-loc', 'localidade', 'Localidade', 'maxlength="40" autocomplete="address-level2" placeholder="Palmela"')
-    : '';
+  /* Um campo de endereço, desenhado só a partir da configuração do país. */
+  function campoCfg(chave, c) {
+    var id = 'ck-' + chave;
+    var extra = 'maxlength="' + c.max + '"';
+    if (c.autocomplete) extra += ' autocomplete="' + c.autocomplete + '"';
+    if (c.inputmode) extra += ' inputmode="' + c.inputmode + '"';
+    if (c.placeholder) extra += ' placeholder="' + esc(c.placeholder) + '"';
+    if (c.obrigatorio) extra += ' aria-required="true"';
+    var notas = [];
+    if (c.ajuda) notas.push(c.ajuda);
+    if (!c.obrigatorio) notas.push('opcional');
+    var ajuda = notas.length ? '<span class="ajuda-campo">' + esc(notas.join(' · ')) + '</span>' : '';
+    return '<div class="campo"><label for="' + id + '">' + esc(c.rotulo) + '</label>' +
+      '<input id="' + id + '" data-ck="' + chave + '" value="' + esc(CHECKOUT[chave] || '') + '" ' + extra + ' />' +
+      ajuda + '</div>';
+  }
+
+  /* Percorre a ordem definida pelo país; campos de meia largura juntam-se dois a dois. */
+  function camposDe(pais, ordem) {
+    var out = '', i = 0;
+    while (i < ordem.length) {
+      var c1 = cfgCampo(pais, ordem[i]);
+      var c2 = i + 1 < ordem.length ? cfgCampo(pais, ordem[i + 1]) : null;
+      if (c1.meia && c2 && c2.meia) {
+        out += '<div class="par-campos">' + campoCfg(ordem[i], c1) + campoCfg(ordem[i + 1], c2) + '</div>';
+        i += 2;
+      } else if (c1.meia) {
+        out += '<div class="par-campos">' + campoCfg(ordem[i], c1) + '</div>';
+        i += 1;
+      } else {
+        out += campoCfg(ordem[i], c1);
+        i += 1;
+      }
+    }
+    return out;
+  }
 
   var blocoMorada = '';
   if (entrega) {
     blocoMorada = '<p class="aviso-entrega">A entrega em mão tem um custo calculado pela distância à creche (até ' + ENTREGA.raioMax + ' km). Confirmamos sempre o valor por WhatsApp antes de enviar.</p>' +
-      camposMorada +
+      camposDe('Portugal', ORDEM_ENTREGA) +
       '<button type="button" class="btn btn-linha btn-sm" id="calcular-entrega">Calcular entrega</button>' +
       '<p class="info-entrega" id="info-entrega" hidden></p>';
   } else if (ctt) {
+    var cfg = cfgPais(CHECKOUT.pais);
     var intl = CHECKOUT.pais !== 'Portugal';
     blocoMorada = '<p class="aviso-entrega">Os portes dos CTT dependem do peso e do destino da encomenda. Confirmamos o valor e o prazo por WhatsApp antes do envio.</p>' +
       '<div class="campo"><label for="ck-pais">País</label><select id="ck-pais" data-ck="pais">' +
@@ -458,9 +724,10 @@ function desenhaCarrinho() {
         }).join('') +
       '</select></div>' +
       (CHECKOUT.pais === 'Outro' ? campo('ck-pais-outro', 'paisOutro', 'Indique o país', 'maxlength="40" placeholder="País de destino"') : '') +
-      camposMorada +
-      campo('ck-dest', 'destinatario', 'Nome do destinatário (se for diferente)', 'maxlength="60" placeholder="Opcional"') +
-      (intl ? '<p class="aviso-entrega">Envio internacional: os prazos são mais longos e, fora da União Europeia, podem existir taxas alfandegárias a cargo de quem recebe. Confirme também o indicativo do telefone (ex.: +34).</p>' : '');
+      camposDe(CHECKOUT.pais, cfg.ordem) +
+      campoCfg('destinatario', cfgCampo(CHECKOUT.pais, 'destinatario')) +
+      (intl ? '<p class="aviso-entrega">Envio internacional: os prazos são mais longos e, fora da União Europeia, podem existir taxas alfandegárias a cargo de quem recebe.' +
+        (cfg.indicativo ? ' O telefone deve levar o indicativo ' + esc(cfg.indicativo) + '.' : ' Indique o telefone com o indicativo internacional.') + '</p>' : '');
   }
 
   corpo.innerHTML = linhas +
@@ -469,7 +736,12 @@ function desenhaCarrinho() {
       '<button type="button" class="limpar" id="limpar">Limpar carrinho</button>' +
     '</div>' +
     campo('ck-nome', 'nome', 'Nome', 'maxlength="60" autocomplete="name" placeholder="O seu nome"') +
-    campo('ck-tel', 'telefone', 'Telefone', 'type="tel" inputmode="tel" autocomplete="tel" maxlength="20" placeholder="912345678"') +
+    '<div class="campo"><label for="ck-tel">Telefone</label>' +
+      '<input id="ck-tel" data-ck="telefone" type="tel" inputmode="tel" autocomplete="tel" maxlength="20"' +
+      ' placeholder="' + esc(cfgTel.telPlaceholder) + '" value="' + esc(CHECKOUT.telefone) + '" />' +
+      '<span class="ajuda-campo">' + (cfgTel.indicativo
+        ? 'indicativo ' + esc(cfgTel.indicativo) + ' — pode escrever só os dígitos locais'
+        : 'escreva com o indicativo internacional (ex.: +34 600 000 000)') + '</span></div>' +
     '<div class="campo"><label>Como quer receber</label><div class="modo-botoes">' +
       '<button type="button" data-modo="recolha" class="' + (modo === 'recolha' ? 'ativo' : '') + '">Recolha na creche</button>' +
       '<button type="button" data-modo="entrega" class="' + (entrega ? 'ativo' : '') + '">Entrega em mão</button>' +
@@ -526,9 +798,17 @@ function mensagemEncomenda() {
     '*Telefone:* ' + CHECKOUT.telefone + '\n' +
     '*Modo:* ' + (CHECKOUT.modo === 'entrega' ? 'Entrega em mão' : CHECKOUT.modo === 'ctt' ? 'Envio CTT' : 'Recolha na creche');
   if (CHECKOUT.modo !== 'recolha') {
-    t += '\n*Morada:* ' + CHECKOUT.morada + ', ' + CHECKOUT.numero +
-      '\n*Código postal:* ' + CHECKOUT.cpostal + ' ' + CHECKOUT.localidade +
-      (CHECKOUT.modo === 'ctt' ? '\n*País:* ' + paisEnvio() : '');
+    /* A morada segue a ordem e os rótulos do país de destino. */
+    var pais = paisAtivo();
+    var ordem = ordemCampos();
+    for (var oi = 0; oi < ordem.length; oi++) {
+      var valor = String(CHECKOUT[ordem[oi]] || '').trim();
+      if (!valor) continue;
+      var cm = cfgCampo(pais, ordem[oi]);
+      /* Rótulo nativo + tradução, para quem lê a encomenda perceber o campo. */
+      t += '\n*' + (cm.ajuda ? cm.rotulo + ' (' + cm.ajuda + ')' : cm.rotulo) + ':* ' + valor;
+    }
+    if (CHECKOUT.modo === 'ctt') t += '\n*País:* ' + paisEnvio();
     if (CHECKOUT.destinatario) t += '\n*Destinatário:* ' + CHECKOUT.destinatario;
     if (CHECKOUT.modo === 'entrega' && CHECKOUT.dist !== null) t += '\n*Distância:* ~' + CHECKOUT.dist.toFixed(1).replace('.', ',') + ' km';
     if (taxa === null) t += '\n_(' + (CHECKOUT.modo === 'ctt' ? 'portes CTT' : 'custo de entrega') + ' a confirmar)_';
@@ -541,17 +821,18 @@ function finalizaEncomenda() {
   var erro = document.getElementById('erro-checkout');
   var falta = [];
   if (CHECKOUT.nome.trim().length < 2) falta.push('nome');
-  if (!telefoneValido(CHECKOUT.telefone)) falta.push('telefone válido (9 dígitos)');
+  if (!telefoneValido(CHECKOUT.telefone)) falta.push(cfgPais(paisAtivo()).telErro);
   if (CHECKOUT.modo !== 'recolha') {
-    if (CHECKOUT.morada.trim().length < 4) falta.push('morada');
-    if (!CHECKOUT.numero.trim()) falta.push('nº da porta');
-    if (CHECKOUT.modo === 'ctt' && CHECKOUT.pais !== 'Portugal') {
-      if (CHECKOUT.cpostal.trim().length < 3) falta.push('código postal');
-      if (CHECKOUT.pais === 'Outro' && CHECKOUT.paisOutro.trim().length < 3) falta.push('país');
-    } else if (!/^\d{4}-\d{3}$/.test(CHECKOUT.cpostal.trim())) {
-      falta.push('código postal');
+    /* As regras vêm todas da configuração do país — nada fixo aqui. */
+    var pais = paisAtivo();
+    var ordem = ordemCampos();
+    if (CHECKOUT.modo === 'ctt' && CHECKOUT.pais === 'Outro' && CHECKOUT.paisOutro.trim().length < 3) {
+      falta.push('país de destino');
     }
-    if (CHECKOUT.localidade.trim().length < 2) falta.push('localidade');
+    for (var oi = 0; oi < ordem.length; oi++) {
+      var msg = validaCampo(ordem[oi], cfgCampo(pais, ordem[oi]));
+      if (msg) falta.push(msg);
+    }
   }
   if (falta.length) {
     erro.hidden = false;
@@ -636,7 +917,7 @@ function ligaLoja() {
     var campo = ev.target.closest('[data-ck]');
     if (!campo) return;
     var chave = campo.getAttribute('data-ck');
-    if (chave === 'pais') { CHECKOUT.pais = campo.value; CHECKOUT.cpostal = ''; desenhaCarrinho(); return; }
+    if (chave === 'pais') { trocaPais(campo.value); desenhaCarrinho(); return; }
     var limpo = limpaCampo(chave, campo.value);
     if (limpo !== campo.value) {
       var pos = campo.selectionStart;
@@ -646,7 +927,7 @@ function ligaLoja() {
       try { campo.setSelectionRange(novaPos, novaPos); } catch (e) {}
     }
     CHECKOUT[chave] = limpo;
-    if (chave === 'morada' || chave === 'cpostal' || chave === 'numero' || chave === 'localidade') {
+    if (chave === 'morada' || chave === 'cpostal' || chave === 'numero' || chave === 'localidade' || chave === 'regiao') {
       limpaEntrega();
       mostraInfoEntrega('', '');
       atualizaTotais();

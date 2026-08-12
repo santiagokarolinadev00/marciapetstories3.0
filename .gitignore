@@ -1,0 +1,7 @@
+# Ferramentas locais — não pertencem ao site publicado
+.claude/
+
+# Sistema
+Thumbs.db
+desktop.ini
+.DS_Store
