@@ -1050,12 +1050,6 @@ function preenche() {
     if (el) el.innerHTML = BLOCOS[id]();
   });
 
-  var navHtml = PAGINAS.map(function (p) {
-    var atual = (window.location.pathname || '').split('/').pop() === p[0];
-    return '<a class="nav-link' + (atual ? ' atual' : '') + '" href="' + esc(p[0]) + '">' + esc(p[1]) + '</a>';
-  }).join('');
-  cadaUm('#nav-desktop, #nav-mobile, #nav-rodape', function (el) { el.innerHTML = navHtml; });
-
   cadaUm('a.wa, #wa-topo', function (el) { el.href = WA; });
   cadaUm('a.ig', function (el) { el.href = CONTACTO.instagram; el.innerHTML = ICONES.ig; });
   cadaUm('a.fb', function (el) { el.href = CONTACTO.facebook; el.innerHTML = ICONES.fb; });

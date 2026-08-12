@@ -17,7 +17,7 @@
       <button class="icone-btn burger" id="abrir-menu" aria-label="Abrir menu">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 6h18v2H3V6Zm0 5h18v2H3v-2Zm0 5h18v2H3v-2Z"></path></svg>
       </button>
-      <nav class="nav" id="nav-desktop">
+      <nav class="nav">
         <a href="index.html">Início</a>
         <a href="sobre.html">Sobre</a>
         <a href="servicos.html">Serviços</a>
@@ -144,24 +144,5 @@
   </footer>
 
   <script src="script.js"></script>
-  <script>
-    document.getElementById('abrir-menu').addEventListener('click', function () {
-      document.getElementById('drawer').classList.add('aberto');
-    });
-    document.getElementById('fechar-menu').addEventListener('click', function () {
-      document.getElementById('drawer').classList.remove('aberto');
-    });
-    document.getElementById('form-reserva').addEventListener('submit', function (ev) {
-      ev.preventDefault();
-      var d = new FormData(ev.target);
-      var texto = [
-        'Olá! Chamo-me ' + (d.get('nome') || '—') + '.',
-        'Cão: ' + (d.get('cao') || '—'),
-        'Serviço: ' + d.get('servico'),
-        d.get('msg')
-      ].filter(Boolean).join('\n');
-      window.open('https://wa.me/351910688326?text=' + encodeURIComponent(texto), '_blank', 'noopener');
-    });
-  </script>
 </body>
 </html>

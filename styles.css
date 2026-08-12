@@ -567,6 +567,7 @@ footer .rotulo { font-size: 14px; font-weight: 600; letter-spacing: .06em; text-
 footer .bloco { display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
 footer p, footer span.claro { font-size: 15px; line-height: 1.7; color: #B7E6E4; }
 footer .nav-rodape { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 24px; width: 100%; }
+footer .nav-rodape a,
 footer .nav-rodape button {
   background: none;
   border: none;
@@ -578,6 +579,7 @@ footer .nav-rodape button {
   transform-origin: left center;
   transition: transform .2s var(--ease), font-weight .2s, color .2s;
 }
+footer .nav-rodape a:hover,
 footer .nav-rodape button:hover { transform: scale(1.08); font-weight: 700; color: #FFD79A; }
 footer a { color: #fff; }
 footer a:hover { color: #FFD79A; }
