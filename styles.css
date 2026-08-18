@@ -697,10 +697,32 @@ footer .fim span { font-size: 14px; color: #8FD6D3; }
 .produto .btn { width: 100%; }
 
 /* FAB */
-.fab-carrinho {
+
+/* Botão flutuante de WhatsApp, em todas as páginas. Ocupa o canto inferior
+   direito; o botão do carrinho, nas páginas que o têm, empilha-se acima. */
+.fab-whatsapp {
   position: fixed;
   right: 18px;
   bottom: calc(18px + env(safe-area-inset-bottom));
+  z-index: 60;
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  background: #25D366;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, .18);
+  transition: transform .2s var(--ease), background .2s;
+}
+.fab-whatsapp:hover { transform: scale(1.06); background: #1DA851; color: #fff; }
+.fab-whatsapp:focus-visible { outline: 3px solid var(--teal-dark); outline-offset: 3px; }
+.fab-carrinho {
+  position: fixed;
+  right: 18px;
+  bottom: calc(86px + env(safe-area-inset-bottom));
   z-index: 60;
   border: 0;
   cursor: pointer;
@@ -739,7 +761,7 @@ footer .fim span { font-size: 14px; color: #8FD6D3; }
 .aviso-add {
   position: fixed;
   right: 18px;
-  bottom: calc(88px + env(safe-area-inset-bottom));
+  bottom: calc(156px + env(safe-area-inset-bottom));
   z-index: 61;
   max-width: min(340px, calc(100vw - 36px));
   background: #fff;
