@@ -237,8 +237,12 @@ input, textarea, select, button { font-family: inherit; }
   position: fixed;
   top: 0;
   right: 0;
-  bottom: 0;
   width: 66.6667%;
+  /* Sem bottom fixo: a altura é a do conteúdo. O máximo (e o overflow) só
+     entram em jogo em ecrãs baixos, como o telemóvel deitado. O dvh repete o
+     vh para os browsers que não o conhecem ficarem com o valor antigo. */
+  max-height: calc(100vh - 24px);
+  max-height: calc(100dvh - 24px);
   z-index: 100;
   background: #fff;
   display: none;
