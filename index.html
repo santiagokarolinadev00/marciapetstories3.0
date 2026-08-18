@@ -26,6 +26,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="icon" href="img/logo.png" />
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link rel="stylesheet" href="styles.css" />
 <script type="application/ld+json">
 {
@@ -88,7 +90,7 @@
   <div class="wrap">
     <img class="logo" src="img/logo.png" alt="Márcia Pet Stories - creche canina em Palmela" data-ir="home" width="120" height="120" />
     <button class="icone-btn burger" id="abrir-menu" aria-label="Abrir menu">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 6h18v2H3V6Zm0 5h18v2H3v-2Zm0 5h18v2H3v-2Z"></path></svg>
+      <i class="fa-solid fa-bars" aria-hidden="true"></i>
     </button>
     <nav class="nav">
       <a href="index.html" class="atual">Início</a>
@@ -107,7 +109,7 @@
   <div class="drawer-topo">
     <img class="drawer-logo" src="img/logo.png" alt="Márcia Pet Stories - creche canina em Palmela" width="120" height="120" />
     <button class="icone-btn" id="fechar-menu" aria-label="Fechar menu">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.3 5.71 12 12.01l-6.3-6.3-1.41 1.41 6.3 6.3-6.3 6.3 1.41 1.41 6.3-6.3 6.3 6.3 1.41-1.41-6.3-6.3 6.3-6.3-1.41-1.41Z"></path></svg>
+      <i class="fa-solid fa-xmark" aria-hidden="true"></i>
     </button>
   </div>
   <nav>
@@ -156,17 +158,17 @@
         </div>
         <div class="feature-grid">
           <article class="feature-card">
-            <div class="feature-icon">🐾</div>
+            <div class="feature-icon"><i class="fa-solid fa-paw" aria-hidden="true"></i></div>
             <h3>Rotina natural</h3>
             <p>Os cães têm espaço para brincar, explorar e descansar no seu próprio ritmo, sem pressões desnecessárias.</p>
           </article>
           <article class="feature-card">
-            <div class="feature-icon">🛡️</div>
+            <div class="feature-icon"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i></div>
             <h3>Segurança e calma</h3>
             <p>Grupos reduzidos, supervisão constante e ambiente pensado para reduzir stress e aumentar confiança.</p>
           </article>
           <article class="feature-card">
-            <div class="feature-icon">💛</div>
+            <div class="feature-icon"><i class="fa-solid fa-heart" aria-hidden="true"></i></div>
             <h3>Atenção individual</h3>
             <p>Cada patudo é observado e acolhido com respeito pela sua personalidade, necessidades e rotina.</p>
           </article>
@@ -212,8 +214,8 @@
           <button class="link-btn" data-ir="galeria">Ver galeria</button>
         </div>
         <div class="galeria-caixa">
-          <button class="seta-flutuante esq" data-rail="rail-creche" data-dir="-1" aria-label="Anterior">‹</button>
-          <button class="seta-flutuante dir" data-rail="rail-creche" data-dir="1" aria-label="Seguinte">›</button>
+          <button class="seta-flutuante esq" data-rail="rail-creche" data-dir="-1" aria-label="Anterior"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></button>
+          <button class="seta-flutuante dir" data-rail="rail-creche" data-dir="1" aria-label="Seguinte"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
           <div class="rail" id="rail-creche"></div>
         </div>
       </div>
@@ -262,7 +264,7 @@
 </footer>
 
 <button type="button" class="fab-carrinho" id="fab-carrinho" hidden aria-label="Ver carrinho">
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2 3h3.2l.9 3.6H21l-2.2 8.1a2 2 0 0 1-1.93 1.47H8.9a2 2 0 0 1-1.94-1.5L4.44 5H2V3Zm4.6 5.6 1.6 6.4h8.4l1.7-6.4H6.6ZM9 18.5a1.75 1.75 0 1 1 0 3.5 1.75 1.75 0 0 1 0-3.5Zm7.5 0a1.75 1.75 0 1 1 0 3.5 1.75 1.75 0 0 1 0-3.5Z"></path></svg>
+  <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
   <span id="fab-contador">0</span>
 </button>
 
@@ -273,7 +275,7 @@
   <div class="carrinho-topo">
     <h3>A sua encomenda</h3>
     <button class="icone-btn" id="fechar-carrinho" type="button" aria-label="Fechar">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.3 5.71 12 12.01l-6.3-6.3-1.41 1.41 6.3 6.3-6.3 6.3 1.41 1.41 6.3-6.3 6.3 6.3 1.41-1.41-6.3-6.3 6.3-6.3-1.41-1.41Z"></path></svg>
+      <i class="fa-solid fa-xmark" aria-hidden="true"></i>
     </button>
   </div>
   <div class="carrinho-corpo" id="carrinho-corpo"></div>

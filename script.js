@@ -574,7 +574,7 @@ function desenhaLoja() {
         var i = PRODUTOS.indexOf(p);
         var foto = p.imagem_url
           ? '<img src="' + esc(p.imagem_url) + '" alt="' + esc(p.nome) + '" loading="lazy" />'
-          : '<span aria-hidden="true">🦴</span>';
+          : '<i class="fa-solid fa-bone" aria-hidden="true"></i>';
         var seletor = p.variantes.length > 1
           ? '<div class="variantes" role="group" aria-label="Variante de ' + esc(p.nome) + '">' +
               p.variantes.map(function (v, k) {
@@ -661,7 +661,7 @@ function adicionaAoCarrinho(indice) {
 function avisaAdicionado(nome, rotulo) {
   var t = document.getElementById('aviso-add');
   if (!t) return;
-  t.innerHTML = '<span class="visto-mini" aria-hidden="true">✓</span>' +
+  t.innerHTML = '<span class="visto-mini" aria-hidden="true"><i class="fa-solid fa-check"></i></span>' +
     '<span class="txt"><b>' + esc(nome) + '</b> (' + esc(rotulo) + ') adicionado</span>' +
     '<button type="button" id="aviso-ver">Ver carrinho</button>';
   t.hidden = false;
@@ -704,9 +704,9 @@ function desenhaCarrinho() {
         '<span class="var">' + esc(l.rotulo) + ' · ' + euros(l.preco) + '</span></div>' +
         '<span class="subtotal">' + euros(l.preco * l.qtd) + '</span></div>' +
       '<div class="base"><div class="stepper">' +
-        '<button type="button" data-qtd="' + i + '" data-d="-1" aria-label="Menos">−</button>' +
+        '<button type="button" data-qtd="' + i + '" data-d="-1" aria-label="Menos"><i class="fa-solid fa-minus" aria-hidden="true"></i></button>' +
         '<span>' + l.qtd + '</span>' +
-        '<button type="button" data-qtd="' + i + '" data-d="1" aria-label="Mais">+</button>' +
+        '<button type="button" data-qtd="' + i + '" data-d="1" aria-label="Mais"><i class="fa-solid fa-plus" aria-hidden="true"></i></button>' +
       '</div><button type="button" class="remover" data-rm="' + i + '">Remover</button></div>' +
       '</div>';
   }).join('');
@@ -901,8 +901,8 @@ function finalizaEncomenda() {
 function ecraSucesso() {
   document.getElementById('carrinho-corpo').innerHTML =
     '<div class="sucesso">' +
-      '<div class="visto" aria-hidden="true">✓</div>' +
-      '<h3>Encomenda recebida! 🩵</h3>' +
+      '<div class="visto" aria-hidden="true"><i class="fa-solid fa-check"></i></div>' +
+      '<h3>Encomenda recebida! <i class="fa-solid fa-heart" aria-hidden="true"></i></h3>' +
       '<p>Obrigada pela sua encomenda. Vamos já preparar os petiscos e entramos em contacto em breve para combinar a entrega ou recolha e o pagamento.</p>' +
       '<p class="dica">Não se esqueça de confirmar o envio da mensagem no WhatsApp.</p>' +
       '<a class="recurso" href="' + esc(ULTIMO_LINK_WA) + '" target="_blank" rel="noopener">O WhatsApp não abriu? Abrir agora</a>' +
@@ -1009,9 +1009,9 @@ var FOTOS_PETISCOS = [
 ];
 
 var ICONES = {
-  ig: '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.2c3.2 0 3.6 0 4.9.07 1.2.05 1.8.25 2.2.42.6.22 1 .48 1.4.9.4.4.7.8.9 1.4.2.4.4 1 .4 2.2.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c0 1.2-.2 1.8-.4 2.2-.2.6-.5 1-.9 1.4-.4.4-.8.7-1.4.9-.4.2-1 .4-2.2.4-1.3.1-1.7.1-4.9.1s-3.6 0-4.9-.1c-1.2 0-1.8-.2-2.2-.4-.6-.2-1-.5-1.4-.9-.4-.4-.7-.8-.9-1.4-.2-.4-.4-1-.4-2.2C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.9c0-1.2.2-1.8.4-2.2.2-.6.5-1 .9-1.4.4-.4.8-.7 1.4-.9.4-.2 1-.4 2.2-.4C8.4 2.2 8.8 2.2 12 2.2Zm0 1.8c-3.1 0-3.5 0-4.8.07-1.1.05-1.7.24-2.1.4-.5.2-.9.44-1.3.84-.4.4-.64.8-.84 1.3-.16.4-.35 1-.4 2.1C2.5 9.9 2.5 10.3 2.5 12s0 2.1.06 3.3c.05 1.1.24 1.7.4 2.1.2.5.44.9.84 1.3.4.4.8.64 1.3.84.4.16 1 .35 2.1.4 1.3.06 1.7.06 4.8.06s3.5 0 4.8-.06c1.1-.05 1.7-.24 2.1-.4.5-.2.9-.44 1.3-.84.4-.4.64-.8.84-1.3.16-.4.35-1 .4-2.1.06-1.2.06-1.6.06-3.3s0-2.1-.06-3.3c-.05-1.1-.24-1.7-.4-2.1-.2-.5-.44-.9-.84-1.3-.4-.4-.8-.64-1.3-.84-.4-.16-1-.35-2.1-.4C15.5 4 15.1 4 12 4Zm0 3.1a4.9 4.9 0 1 1 0 9.8 4.9 4.9 0 0 1 0-9.8Zm0 8a3.1 3.1 0 1 0 0-6.2 3.1 3.1 0 0 0 0 6.2Zm6.2-8.2a1.15 1.15 0 1 1-2.3 0 1.15 1.15 0 0 1 2.3 0Z"></path></svg>',
-  fb: '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0 0 22 12Z"></path></svg>',
-  wa: '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.6 2 2.2 6.4 2.2 11.84c0 1.74.46 3.44 1.32 4.94L2 22l5.36-1.4a9.8 9.8 0 0 0 4.68 1.2h.01c5.43 0 9.84-4.4 9.84-9.84A9.78 9.78 0 0 0 12.04 2Zm0 17.98h-.01a8.2 8.2 0 0 1-4.16-1.14l-.3-.18-3.18.83.85-3.1-.2-.32a8.15 8.15 0 0 1-1.25-4.35c0-4.51 3.68-8.18 8.2-8.18a8.16 8.16 0 0 1 8.18 8.2c0 4.51-3.67 8.18-8.13 8.18Zm4.49-6.13c-.25-.13-1.45-.72-1.68-.8-.22-.08-.39-.12-.55.13-.16.24-.63.79-.77.95-.14.17-.28.19-.53.06-.24-.12-1.03-.38-1.97-1.21-.73-.65-1.22-1.45-1.36-1.7-.14-.24-.02-.37.11-.5.11-.11.24-.28.37-.42.12-.15.16-.25.24-.41.08-.17.04-.31-.02-.44-.06-.12-.55-1.33-.76-1.82-.2-.47-.4-.41-.55-.42h-.47c-.16 0-.42.06-.64.31-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.69 2.58 4.1 3.62.57.24 1.02.39 1.37.5.57.19 1.1.16 1.51.1.46-.07 1.45-.59 1.65-1.17.2-.57.2-1.06.14-1.16-.06-.11-.22-.17-.47-.3Z"></path></svg>'
+  ig: '<i class="fa-brands fa-instagram" aria-hidden="true"></i>',
+  fb: '<i class="fa-brands fa-facebook-f" aria-hidden="true"></i>',
+  wa: '<i class="fa-brands fa-whatsapp" aria-hidden="true"></i>'
 };
 
 /* Escapa para HTML. As aspas são obrigatórias: o resultado entra em atributos
@@ -1080,7 +1080,7 @@ var BLOCOS = {
   'faq': function () {
     return FAQS.map(function (f, i) {
       return '<div class="faq-item' + (i === 0 ? ' aberto' : '') + '">' +
-        '<button type="button">' + esc(f[0]) + '<span>' + (i === 0 ? '−' : '+') + '</span></button>' +
+        '<button type="button">' + esc(f[0]) + '<span><i class="fa-solid ' + (i === 0 ? 'fa-minus' : 'fa-plus') + '" aria-hidden="true"></i></span></button>' +
         '<p>' + esc(f[1]) + '</p></div>';
     }).join('');
   },
@@ -1173,6 +1173,13 @@ function paginaInicial() {
   return 'home';
 }
 
+/* O sinal do acordeão: menos quando a pergunta está aberta, mais quando está
+   fechada. Troca-se a classe do ícone, não o texto. */
+function iconeFaq(item, aberto) {
+  var icone = item.querySelector('span i');
+  if (icone) icone.className = 'fa-solid ' + (aberto ? 'fa-minus' : 'fa-plus');
+}
+
 /* ---------- Eventos ---------- */
 function liga() {
   document.addEventListener('click', function (ev) {
@@ -1197,11 +1204,11 @@ function liga() {
       for (var i = 0; i < abertos.length; i++) {
         if (abertos[i] !== item) {
           abertos[i].classList.remove('aberto');
-          abertos[i].querySelector('span').textContent = '+';
+          iconeFaq(abertos[i], false);
         }
       }
       item.classList.toggle('aberto');
-      faq.querySelector('span').textContent = item.classList.contains('aberto') ? '−' : '+';
+      iconeFaq(item, item.classList.contains('aberto'));
     }
   });
 

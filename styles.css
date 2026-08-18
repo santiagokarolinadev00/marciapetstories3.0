@@ -64,11 +64,11 @@ input, textarea, select, button { font-family: inherit; }
 .avulso-price { display: flex; align-items: baseline; gap: 10px; }
 .avulso-label { font-size: 15px; color: #7a6a4d; }
 .faq-title { margin: 64px 0 24px; }
-.store-title { font-size: clamp(23px,3.4vw,30px); }
+.store-title { font-size: clamp(22px,3.4vw,25px); }
 .small-sub { font-size: 16px; }
 .shop-spacing { margin-top: 32px; }
-.gallery-title { font-size: clamp(23px,3.4vw,30px); margin-bottom: 32px; }
-.section-header { display: flex; flex-direction: column; gap: 14px; margin-bottom: 32px; }
+.gallery-title { font-size: clamp(22px,3.4vw,25px); margin-bottom: 32px; }
+.section-header { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; margin-bottom: 32px; }
 .section-header.center { align-items: center; text-align: center; }
 .section-header h2 { margin: 0; }
 .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
@@ -83,6 +83,7 @@ input, textarea, select, button { font-family: inherit; }
   box-shadow: 0 8px 24px rgba(16, 124, 120, .04);
 }
 .feature-icon {
+  color: var(--teal-dark);
   width: 52px;
   height: 52px;
   border-radius: 16px;
@@ -90,7 +91,7 @@ input, textarea, select, button { font-family: inherit; }
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 28px;
+  font-size: 24px;
 }
 .feature-card h3 { font-size: 19px; color: var(--texto); }
 .feature-card p { font-size: 15px; line-height: 1.75; }
@@ -119,9 +120,9 @@ input, textarea, select, button { font-family: inherit; }
   align-items: center;
   justify-content: center;
 }
-.placeholder-photo::before {
-  content: "🐶";
+.placeholder-photo i {
   font-size: 42px;
+  color: var(--teal-dark);
   opacity: 0.6;
 }
 .testimonial-card p {
@@ -191,6 +192,7 @@ input, textarea, select, button { font-family: inherit; }
 .nav button.atual { color: var(--teal); border-bottom-color: var(--teal); }
 
 .icone-btn {
+  font-size: 20px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -272,8 +274,8 @@ section { padding-top: clamp(44px, 7vw, 72px); padding-bottom: clamp(44px, 7vw, 
 .fundo-creme { background: var(--creme); }
 .fundo-cinza { background: var(--fundo); }
 
-h1 { margin: 0; font-size: clamp(30px, 5.4vw, 48px); line-height: 1.1; font-weight: 700; }
-h2 { margin: 0; font-size: clamp(24px, 3.6vw, 32px); font-weight: 700; }
+h1 { margin: 0; font-size: clamp(30px, 5.4vw, 40px); line-height: 1.1; font-weight: 700; }
+h2 { margin: 0; font-size: clamp(24px, 3.6vw, 27px); font-weight: 700; }
 h3 { margin: 0; font-size: 19px; font-weight: 600; }
 p { margin: 0; line-height: 1.8; color: var(--texto-2); }
 
@@ -327,20 +329,24 @@ p { margin: 0; line-height: 1.8; color: var(--texto-2); }
   gap: 10px;
 }
 .numero {
-  width: 44px;
-  height: 44px;
-  border-radius: 22px;
+  width: 32px;
+  height: 32px;
+  border-radius: 16px;
   background: var(--teal-tint);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--teal);
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 700;
   flex: none;
 }
 .numero.laranja { background: var(--laranja); color: #fff; width: 36px; height: 36px; font-size: 16px; }
 .titulo-linha { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+/* Na página de Serviços o título do cartão é um h2 (é um serviço, não uma
+   secção), mas veste-se como o h3 dos cartões iguais da página inicial —
+   senão herdava os 32px de título de secção. */
+.cartao h2 { font-size: 19px; font-weight: 600; }
 .tag-pontual {
   background: #FDF3E0;
   color: var(--laranja-dark);
@@ -406,7 +412,7 @@ p { margin: 0; line-height: 1.8; color: var(--texto-2); }
   gap: 16px;
   align-items: center;
 }
-.faq-item button span { color: var(--teal); font-size: 20px; font-weight: 400; flex: none; }
+.faq-item button span { color: var(--teal); font-size: 15px; font-weight: 400; flex: none; }
 .faq-item p { padding: 0 24px 22px; font-size: 16px; line-height: 1.75; display: none; }
 .faq-item.aberto p { display: block; }
 
@@ -458,7 +464,7 @@ p { margin: 0; line-height: 1.8; color: var(--texto-2); }
   background: transparent;
   border: none;
   color: #fff;
-  font-size: 34px;
+  font-size: 20px;
   line-height: 1;
   cursor: pointer;
   text-shadow: 0 1px 6px rgba(0, 0, 0, .5);
@@ -526,6 +532,7 @@ p { margin: 0; line-height: 1.8; color: var(--texto-2); }
 .mapa-caixa iframe { display: block; width: 100%; height: 260px; border: 0; }
 .social { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
 .social a.cheio {
+  font-size: 20px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -538,6 +545,7 @@ p { margin: 0; line-height: 1.8; color: var(--texto-2); }
 }
 .social a.cheio:hover { background: var(--laranja); color: #fff; }
 .social a.linha {
+  font-size: 20px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -710,6 +718,7 @@ footer .fim span { font-size: 14px; color: #8FD6D3; }
   box-shadow: 0 8px 22px rgba(0,0,0,.18);
   transition: transform .2s var(--ease);
 }
+.fab-carrinho i { font-size: 20px; }
 .fab-carrinho:hover { transform: scale(1.06); }
 .fab-carrinho[hidden] { display: none; }
 .fab-carrinho span {
@@ -882,7 +891,7 @@ footer .fim span { font-size: 14px; color: #8FD6D3; }
   border: 0;
   background: #fff;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 14px;
   font-family: inherit;
   color: var(--teal-dark);
 }
