@@ -359,8 +359,10 @@ p { margin: 0; line-height: 1.8; color: var(--texto-2); }
   padding: 3px 10px;
   border-radius: 20px;
 }
-.nota { font-size: 14px; line-height: 1.6; color: var(--laranja-dark); }
-.cartao p, .passo p { font-size: 15px; line-height: 1.7; }
+/* A nota dos serviços pontuais. O tamanho vive só aqui: as regras dos
+   cartões excluem-na com :not(.nota), senão venciam-na por especificidade. */
+.nota { font-size: 13px; line-height: 1.6; color: var(--laranja-dark); }
+.cartao p:not(.nota), .passo p:not(.nota) { font-size: 15px; line-height: 1.7; }
 .passo { display: flex; flex-direction: column; gap: 10px; }
 .passo-topo { display: flex; align-items: center; gap: 12px; }
 .passo-topo .numero { flex: none; }
@@ -527,8 +529,7 @@ p { margin: 0; line-height: 1.8; color: var(--texto-2); }
 .cartao.largo { flex-direction: row; gap: 20px; align-items: flex-start; padding: 28px; }
 .cartao.largo .interior { display: flex; flex-direction: column; gap: 8px; }
 .cartao.largo h3 { font-size: 20px; }
-.cartao.largo p { font-size: 16px; }
-.cartao.largo .nota { font-size: 15px; }
+.cartao.largo p:not(.nota) { font-size: 16px; }
 
 .passo h3 { font-size: 18px; margin: 0; }
 .mapa-caixa { border: 1px solid var(--borda); border-radius: var(--raio); overflow: hidden; }
