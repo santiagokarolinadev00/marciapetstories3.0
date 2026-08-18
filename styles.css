@@ -230,8 +230,6 @@ input, textarea, select, button { font-family: inherit; }
 .btn-sm { height: auto; padding-left: 24px; padding-right: 24px; border-radius: 22px; font-size: 15px; }
 .btn-xs { height: auto; padding-left: 20px; padding-right: 20px; border-radius: 20px; font-size: 15px; white-space: nowrap; }
 
-.voltar { padding-top: 20px; padding-bottom: 24px; }
-
 /* ---------- Menu mobile ---------- */
 .drawer {
   position: fixed;
