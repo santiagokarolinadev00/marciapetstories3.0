@@ -594,6 +594,56 @@ function desenhaLoja() {
   }).join('');
 }
 
+function ehAbsoluto(url) {
+  return url.indexOf('http://') === 0 || url.indexOf('https://') === 0;
+}
+
+/* Dados estruturados da loja para o Google.
+   O catálogo pode vir do Supabase, por isso o schema.org é gerado a partir do
+   mesmo PRODUTOS que desenha a loja — nunca fica dessincronizado do que está
+   à venda. Só corre na página que tem a loja. */
+function dadosProdutos() {
+  if (!document.getElementById('loja') || !PRODUTOS.length) return;
+
+  var base = window.location.href.replace(/[^\/]*$/, '');
+  var itens = PRODUTOS.map(function (p, i) {
+    var precos = p.variantes.map(function (v) { return v.preco; }).filter(function (n) { return n > 0; });
+    var produto = {
+      '@type': 'Product',
+      name: p.nome,
+      category: p.grupo,
+      brand: { '@type': 'Brand', name: 'Amor à Dentada' }
+    };
+    if (p.descricao) produto.description = p.descricao;
+    if (p.imagem_url) produto.image = ehAbsoluto(p.imagem_url) ? p.imagem_url : base + p.imagem_url;
+    if (precos.length) {
+      produto.offers = {
+        '@type': 'AggregateOffer',
+        priceCurrency: 'EUR',
+        lowPrice: Math.min.apply(null, precos),
+        highPrice: Math.max.apply(null, precos),
+        offerCount: p.variantes.length,
+        availability: 'https://schema.org/InStock'
+      };
+    }
+    return { '@type': 'ListItem', position: i + 1, item: produto };
+  });
+
+  var el = document.getElementById('dados-loja');
+  if (!el) {
+    el = document.createElement('script');
+    el.id = 'dados-loja';
+    el.type = 'application/ld+json';
+    document.head.appendChild(el);
+  }
+  el.textContent = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Petiscos Amor à Dentada',
+    itemListElement: itens
+  });
+}
+
 function adicionaAoCarrinho(indice) {
   var p = PRODUTOS[indice];
   if (!p) return;
@@ -1193,7 +1243,7 @@ limpaHashAntigo();
 preenche();
 liga();
 ligaLoja();
-carregaProdutos(function () { desenhaLoja(); });
+carregaProdutos(function () { desenhaLoja(); dadosProdutos(); });
 desenhaCarrinho();
 if (document.getElementById('pg-home')) {
   irPara(paginaInicial(), true);

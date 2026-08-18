@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://www.marciapetstories.pt/sitemap.xml
+Sitemap: https://santiagokarolinadev00.github.io/marciapetstories3.0/sitemap.xml
