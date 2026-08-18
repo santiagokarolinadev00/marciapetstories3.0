@@ -1103,7 +1103,7 @@ function irPara(pagina, semScroll) {
   if (drawer) drawer.classList.remove('aberto');
 
   limpaHashAntigo();
-  try { window.localStorage.setItem('mps-page', pagina); } catch (e) {}
+  try { window.localStorage.removeItem('mps-page'); } catch (e) {}
   if (!semScroll) suaveAte(0, 900);
 }
 
@@ -1120,9 +1120,6 @@ function paginaInicial() {
     if (PAGINAS.some(function (p) { return p[0] === paginaAtual || p[0].replace(/\.html$/, '') === nomePagina; })) return nomePagina;
   }
 
-  var guardada = null;
-  try { guardada = window.localStorage.getItem('mps-page'); } catch (e) {}
-  if (PAGINAS.some(function (p) { return p[0] === guardada || p[0].replace(/\.html$/, '') === guardada; })) return guardada;
   return 'home';
 }
 
