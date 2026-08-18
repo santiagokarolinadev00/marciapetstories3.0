@@ -1000,5 +1000,7 @@ footer .fim span { font-size: 14px; color: #8FD6D3; }
 }
 
 
-/* Sem barra de rolagem horizontal (a gaveta vive fora do ecrã) */
-html, body { overflow-x: hidden; max-width: 100%; }
+/* Evita barra de rolagem horizontal. Tem de ser 'clip' e não 'hidden': o
+   'hidden' faz do html um contentor de rolagem e isso quebra o
+   position: sticky do cabeçalho. O 'clip' recorta sem criar esse contentor. */
+html, body { overflow-x: clip; max-width: 100%; }
