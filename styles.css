@@ -145,6 +145,8 @@ input, textarea, select, button { font-family: inherit; }
 .compact-panel { gap: 18px; }
 .footer-meta { font-size: 15px; line-height: 1.7; }
 .footer-social { padding-top: 4px; }
+.aviso-privacidade{font-size:13px;color:#5c6466;margin-top:8px;line-height:1.5}
+.aviso-privacidade a{color:var(--teal-dark)}
 .drawer-logo { height: 64px; width: auto; }
 
 /* ---------- Cabeçalho ---------- */

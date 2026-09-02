@@ -801,7 +801,8 @@ function desenhaCarrinho() {
     '<div class="campo"><label for="ck-notas">Notas (opcional)</label><textarea id="ck-notas" data-ck="notas" rows="2" maxlength="300" placeholder="Alguma indicação para a encomenda?">' + esc(CHECKOUT.notas) + '</textarea></div>' +
     '<div class="carrinho-total" id="bloco-totais"></div>' +
     '<p class="erro-checkout" id="erro-checkout" hidden></p>' +
-    '<button type="button" class="btn btn-wa" id="finalizar">Finalizar no WhatsApp</button>';
+    '<button type="button" class="btn btn-wa" id="finalizar">Finalizar no WhatsApp</button>' +
+    '<p class="aviso-privacidade">Ao enviar, os seus dados são usados apenas para tratar o seu pedido. Consulte a <a href="privacidade.html">Política de Privacidade</a>.</p>';
 
   atualizaTotais();
   if (entrega && CHECKOUT.dist !== null) {
