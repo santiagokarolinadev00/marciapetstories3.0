@@ -143,7 +143,7 @@ input, textarea, select, button { font-family: inherit; }
 .testimonial-author span { font-size: 13px; color: var(--texto-3); }
 .cta-panel { max-width: 900px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 20px; }
 .compact-panel { gap: 18px; }
-.aviso-privacidade{font-size:13px;color:#5c6466;margin-top:8px;line-height:1.5}
+.aviso-privacidade{font-size:13px;font-weight:300;font-style:italic;color:#5c6466;margin-top:8px;line-height:1.5}
 .aviso-privacidade a{color:var(--teal-dark)}
 
 /* ---------- Política de Privacidade ---------- */
@@ -166,7 +166,6 @@ input, textarea, select, button { font-family: inherit; }
 .pagina-privacidade .voltar { display: inline-block; margin-top: 8px; color: var(--teal-dark); font-weight: 600; text-decoration: none; }
 .footer-meta { font-size: 15px; line-height: 1.7; }
 .footer-social { padding-top: 4px; }
-.aviso-privacidade{font-size:13px;color:#5c6466;margin-top:8px;line-height:1.5}
 .aviso-privacidade a{color:var(--teal-dark)}
 .drawer-logo { height: 64px; width: auto; }
 
