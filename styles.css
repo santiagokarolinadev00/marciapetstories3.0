@@ -500,6 +500,54 @@ p { margin: 0; line-height: 1.8; color: var(--texto-2); }
 .seta-flutuante.esq { left: 4px; }
 .seta-flutuante.dir { right: 4px; }
 
+#rail-galeria img { cursor: zoom-in; }
+.lightbox[hidden] { display: none; }
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  background: rgba(15, 124, 120, .72);
+}
+.lightbox-conteudo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  max-width: 94vw;
+  max-height: 94vh;
+  margin: 0;
+}
+.lightbox-conteudo img {
+  display: block;
+  max-width: 94vw;
+  max-height: 84vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: var(--raio);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, .3);
+}
+.lightbox-conteudo figcaption { color: #fff; font-size: 14px; text-align: center; }
+.lightbox-fechar {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(255, 255, 255, .7);
+  border-radius: 50%;
+  background: transparent;
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+}
+.lightbox-fechar:hover { background: rgba(255, 255, 255, .18); }
+.lightbox-aberto { overflow: hidden; }
+
 #rail-galeria > *, #fotos-petiscos > * { width: clamp(240px, 26vw, 320px); }
 .grelha-servicos { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); gap: 20px; }
 @media (max-width: 600px) {
